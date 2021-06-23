@@ -34,7 +34,7 @@ export default {
   mounted() {
     axios
       .get(
-        `http://127.0.0.1:8000/users/${ this.$route.params.id}/activities` ) 
+        `${process.env.VUE_APP_URL}/${ this.$route.params.id}/activities` ) 
       .then((response) => (this.info = response.data))
       .catch((err) => {
         console.log(err);
