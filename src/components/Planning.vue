@@ -2,7 +2,15 @@
   <!-- <div>{{ info }}</div> -->
 <div class="container">
   <h1>Planning du</h1>
-    <FullCalendar ref="fullCalendar" :options="calendarOptions" />
+   <FullCalendar :options='calendarOptions'>
+    <template v-slot:eventContent='arg'>
+      
+      <h1 class="title">{{ arg.event.title }} <span class="time"> {{arg.timeText }}</span> </h1>
+      <p class="description">
+        {{ arg.event.extendedProps.description}}
+      </p>
+    </template>
+  </FullCalendar>
 </div>
 
 </template>
@@ -25,6 +33,7 @@ export default {
     return {
       info: null,
       hours:[],
+      calendar: null,
       calendarOptions: {
         plugins: [ timeGridPlugin, interactionPlugin ],
         initialView: 'timeGridDay',
@@ -48,9 +57,6 @@ export default {
     try {
       let response = await axios.get(`${process.env.VUE_APP_URL}/${ this.$route.params.id}/activities` );
       this.calendarOptions.events = await this.formatDateFromData(response.data);
-      this.setDescription()
-      // let calendarApi = this.$refs.fullCalendar.getApi()
-      // console.log(calendarApi)
 
     } catch (e) {
       console.error(e);
@@ -72,20 +78,11 @@ export default {
           start: row.beginAt.replace(' ', 'T'),
           end: row.endAt.replace(' ', 'T'),
           backgroundColor: this.getRandomColor(),
-          className: "activity-" + row.id
         }
       });
 
       return infosWithFormatedDate;
     },
-    setDescription: function () {
-      this.calendarOptions.events.forEach(event => {
-        let html = document.createElement("p");
-        html.innerText = event.description;
-
-        console.log(document.querySelector("activity-7"));
-      })
-    }
   }
 };
 </script>
@@ -96,30 +93,38 @@ export default {
   padding:0 200px;
 }
 
+/* remove yellow background default color */
 
 .fc .fc-timegrid-col.fc-day-today {
    background: none;
    margin: 0 auto;
  }
 
-.fc-event-today {
+/* activity card */
+.fc-event-main {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-/* style title from activity */
 
-.fc-event-title {
-  font-size:20px ;
-  font-weight: bold;
-  order:1;
-  margin-top: 10px;
+h1 {
+  margin:0;
 }
 
-/* style hours from activity */
-.fc-event-time {
-  order: 2;
-  margin-bottom: 15px !important;
+.description {
+  margin-top:5px;
+  height: 30px;
+  overflow: hidden;
+}
+
+.time {
+  font-weight: 700;
+  font-size: 14px;
+  position:absolute;
+  left: 10px;
 }
 
 /* delete acitivty dot color */
@@ -147,18 +152,6 @@ export default {
 
 /* ---- end delete table borders----- */
  
-.fc-event-main-frame{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items:center;
-}
-
-/* width for activity card */
-
-.fc-timegrid-event-harness {
- width: 500px !important;
-}
 
 /* set background color for activity card */
 .fc-v-event {
@@ -171,21 +164,14 @@ export default {
 
 .fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
   border-radius:15px;
+  box-shadow: 5px 5px 10px rgb(0,0,0,0.1);
+  overflow: hidden;
 }
 
 /* height of rows */
 .fc-direction-ltr .fc-timegrid-slot-label-frame {
   height: 50px;
-  width: 100px;;
-}
-
-/* set hours label position and style */
-.fc .fc-timegrid-axis-cushion, .fc .fc-timegrid-slot-label-cushion {
-  display:flex;
-  justify-content: center;
-  align-items: center;
-  height:100%;
-  font-weight: bold;
+  width: 60px;;
 }
 
 /* set mragin 5% to the right for activity card */
@@ -194,7 +180,7 @@ export default {
   margin-left: 7%;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .container {
     padding: 0;
     height: 100vh;
@@ -212,6 +198,15 @@ export default {
   .fc .fc-scroller-harness-liquid {
     height:100vh;
   }
+ 
+.title {
+  display: flex;
+  flex-direction: column;
+}
+
+.time {
+  position: static;
+}
 }
 
 
