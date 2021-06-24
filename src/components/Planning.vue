@@ -1,97 +1,219 @@
 <template>
   <!-- <div>{{ info }}</div> -->
-<div class="flex">
-
-  <div class="gridActivity">
-    <li class="nb" v-for="i in hours" :key="i">{{i}}</li>
-    <li v-for="element in info" :key="element.id" :style="{'grid-row': setRowPlace(element.beginAt) ,'grid-column': 2 }">
-      <Activity 
-      :title="element.title" 
-      :description="element.description" 
-      :hour="element.beginAt"
-      /> 
-
-    </li>
-  </div>
-   
+<div class="container">
+  <h1>Planning du</h1>
+    <FullCalendar ref="fullCalendar" :options="calendarOptions" />
 </div>
 
 </template>
 
 <script>
 
-import Activity from "./Activity.vue"
 import axios from "axios";
+
+import '@fullcalendar/core/vdom' // solves problem with Vite
+import FullCalendar from '@fullcalendar/vue'
+// import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import frLocale from '@fullcalendar/core/locales/fr';
+import timeGridPlugin from '@fullcalendar/timegrid';
+
 
 export default {
   name: "Planning",
   data: function () {
     return {
       info: null,
-      hours:[]
+      hours:[],
+      calendarOptions: {
+        plugins: [ timeGridPlugin, interactionPlugin ],
+        initialView: 'timeGridDay',
+        locales: [frLocale],
+        locale:"fr",
+        headerToolbar: {
+          start: "",
+          center:'title',
+          end: '',
+        } ,
+        slotMinTime: "07:00:00",
+        slotLabelInterval: "00:30",
+        allDaySlot:false,
+        events: [],
+      },
+      
+       
     };
   },
-  mounted() {
-    axios
-      .get(
-        `${process.env.VUE_APP_URL}/${ this.$route.params.id}/activities` ) 
-      .then((response) => (this.info = response.data))
-      .catch((err) => {
-        console.log(err);
-      });
+  async mounted() {
+    try {
+      let response = await axios.get(`${process.env.VUE_APP_URL}/${ this.$route.params.id}/activities` );
+      this.calendarOptions.events = await this.formatDateFromData(response.data);
+      this.setDescription()
+      // let calendarApi = this.$refs.fullCalendar.getApi()
+      // console.log(calendarApi)
 
-    for (let i = 7; i < 18; i++) {
-      this.hours.push(i);
-    }
+    } catch (e) {
+      console.error(e);
+    }  
 
   },
   components: {
-    Activity
+    FullCalendar
   },
   methods: {
-    setRowPlace: function (hour) {
-      let activityHour = new Date(hour).getHours();
-      let res;
-
-      this.hours.forEach((v,k) => {
-        if (v === activityHour) {
-          res = k + 1;
+    getRandomColor: function () {
+      let colors = ["#A4F3B1", "#B9A4F3", "A4EAF3", "F29090"];
+      return colors[Math.floor(Math.random() * (colors.length - 1) )];
+    },
+    formatDateFromData: function (data) {
+      let infosWithFormatedDate = data.map((row) => {
+        return {
+          ...row,
+          start: row.beginAt.replace(' ', 'T'),
+          end: row.endAt.replace(' ', 'T'),
+          backgroundColor: this.getRandomColor(),
+          className: "activity-" + row.id
         }
-        
       });
 
-       return res;
+      return infosWithFormatedDate;
+    },
+    setDescription: function () {
+      this.calendarOptions.events.forEach(event => {
+        let html = document.createElement("p");
+        html.innerText = event.description;
+
+        console.log(document.querySelector("activity-7"));
+      })
     }
   }
 };
 </script>
 
-<style scoped>
+<style>
 
- li {
-   list-style: none;
+.container {
+  padding:0 200px;
+}
+
+
+.fc .fc-timegrid-col.fc-day-today {
+   background: none;
+   margin: 0 auto;
  }
 
-.gridActivity {
-  display: grid;
-  grid-template-rows: repeat(10, 100px);
-  grid-auto-rows: minmax(100px, 100px);
-  grid-template-columns: 40px 600px 600px;
- }
+.fc-event-today {
+    display: flex;
+    flex-direction: column;
+}
 
- .flex {
-   display: flex;
-   flex-direction: row;
- }
+/* style title from activity */
 
- ul {
-   display: flex;
-   flex-direction: column;
- }
+.fc-event-title {
+  font-size:20px ;
+  font-weight: bold;
+  order:1;
+  margin-top: 10px;
+}
 
- .nb {
-   grid-column:1;
-   margin:auto;
-   font-weight: bold;
- }
+/* style hours from activity */
+.fc-event-time {
+  order: 2;
+  margin-bottom: 15px !important;
+}
+
+/* delete acitivty dot color */
+
+.fc-daygrid-event-dot {
+  display: none;
+}
+
+/* -------- start delete table borders------ */
+.fc-theme-standard td, .fc-theme-standard ths {
+  border:none;
+}
+
+.fc-scrollgrid  .fc-scrollgrid-liquid  { 
+    border-collapse: collapse;
+}
+
+.fc .fc-timegrid-slot-minor {
+  border:none;
+}
+
+.fc-v-event {
+  border:none;
+}
+
+/* ---- end delete table borders----- */
+ 
+.fc-event-main-frame{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items:center;
+}
+
+/* width for activity card */
+
+.fc-timegrid-event-harness {
+ width: 500px !important;
+}
+
+/* set background color for activity card */
+.fc-v-event {
+  background:#A4EAF3;
+  border:none;
+  box-shadow:2px 2px 10px rgb(0,0,0,0.1);
+}
+
+/* border radius for activity card */
+
+.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
+  border-radius:15px;
+}
+
+/* height of rows */
+.fc-direction-ltr .fc-timegrid-slot-label-frame {
+  height: 50px;
+  width: 100px;;
+}
+
+/* set hours label position and style */
+.fc .fc-timegrid-axis-cushion, .fc .fc-timegrid-slot-label-cushion {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height:100%;
+  font-weight: bold;
+}
+
+/* set mragin 5% to the right for activity card */
+.fc-timegrid-event-harness-inset {
+
+  margin-left: 7%;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0;
+    height: 100vh;
+  }
+
+  .fc-timegrid-event-harness-inset {
+
+  margin-left: 30%;
+  }
+
+  .fc-timegrid-event-harness {
+    width: 200px !important;
+  }
+
+  .fc .fc-scroller-harness-liquid {
+    height:100vh;
+  }
+}
+
+
+
 </style>
