@@ -180,7 +180,17 @@ h1 {
   margin-left: 7%;
 }
 
-@media (max-width: 800px) {
+
+
+@media screen and (max-width: 425px) {
+  .fc-timegrid-event { width: 240px !important}
+
+  .fc-timegrid-event-harness-inset {
+    margin-left: 20% !important;
+  }
+}
+
+@media (max-width: 768px) {
   .container {
     padding: 0;
     height: 100vh;
@@ -188,25 +198,35 @@ h1 {
 
   .fc-timegrid-event-harness-inset {
 
-  margin-left: 30%;
+  margin-left: 20%;
   }
 
   .fc-timegrid-event-harness {
-    width: 200px !important;
+    width: 240px !important;
   }
+
+  .fc-timegrid-event { width: 600px;}
 
   .fc .fc-scroller-harness-liquid {
     height:100vh;
   }
- 
-.title {
-  display: flex;
-  flex-direction: column;
+  
+  .title {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .time {
+    position: static;
+  }
 }
 
-.time {
-  position: static;
-}
+@media screen and (max-width: 1024px) {
+  .container {padding:0 !important;}
+
+  .fc-timegrid-event-harness-inset {
+    margin-left: 10%;
+  }
 }
 
 
