@@ -45,7 +45,7 @@ export default {
           end: '',
         } ,
         slotMinTime: "07:00:00",
-        slotLabelInterval: "00:30",
+        slotLabelInterval: "00:05",
         allDaySlot:false,
         events: [],
       },
@@ -55,8 +55,12 @@ export default {
   },
   async mounted() {
     try {
-      let response = await axios.get(`${process.env.VUE_APP_URL}/${ this.$route.params.id}/activities` );
-      this.calendarOptions.events = await this.formatDateFromData(response.data);
+      let response = await axios.get(`${process.env.VUE_APP_URL}/users/${ this.$route.params.id}/activities` );
+      let data = response.data.data[0];
+      let firstEvent = data.description[0];
+
+      this.placeFirstEvent(data.start, firstEvent.duree, firstEvent.description);
+      // this.calendarOptions.events = await this.formatDateFromData(response.data.data[0]);
 
     } catch (e) {
       console.error(e);
@@ -67,22 +71,41 @@ export default {
     FullCalendar
   },
   methods: {
+    addZeros: (n) => n > 0 && n < 10 && `0${n}`,
     getRandomColor: function () {
       let colors = ["#A4F3B1", "#B9A4F3", "A4EAF3", "F29090"];
       return colors[Math.floor(Math.random() * (colors.length - 1) )];
     },
-    formatDateFromData: function (data) {
-      let infosWithFormatedDate = data.map((row) => {
-        return {
-          ...row,
-          start: row.beginAt.replace(' ', 'T'),
-          end: row.endAt.replace(' ', 'T'),
-          backgroundColor: this.getRandomColor(),
-        }
-      });
+    // formatDateFromData: function (data) {
+    //   let infosWithFormatedDate = data.map((row) => {
+    //     return {
+    //       ...row,
+    //       start: row.beginAt.replace(' ', 'T'),
+    //       end: row.endAt.replace(' ', 'T'),
+    //       backgroundColor: this.getRandomColor(),
+    //     }
+    //   });
 
-      return infosWithFormatedDate;
-    },
+    //   return infosWithFormatedDate;
+    // },
+    placeFirstEvent: function (start, duration, description) {
+
+      let end = new Date(start)
+
+      // calculate end based on event duration
+      end.setMinutes( end.getMinutes() + parseInt(duration) ); 
+    
+      //get Date Time string 
+      end = `${end.getFullYear()}-${this.addZeros(end.getMonth() + 1 )}-${end.getDate()}T${end.toTimeString().split(" ")[0]}` 
+      console.log(start, end);
+
+      this.calendarOptions.events.push({
+        start,
+        end,
+        backgroundColor: this.getRandomColor(),
+        description
+      }) 
+    }
   }
 };
 </script>
