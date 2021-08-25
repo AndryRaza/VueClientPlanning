@@ -27,7 +27,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 
 export default {
   name: "Planning",
-  data: function() {
+  data: function () {
     return {
       info: null,
       hours: [],
@@ -54,8 +54,8 @@ export default {
       let response = await axios.get(
         `${process.env.VUE_APP_URL}/${this.$route.params.id}/activities`
       );
-      let data = response.data.data[0];
-      let firstEvent = data.description[0];
+      let data = response.data.data;
+      let firstEvent = data[0];
 
       this.placeFirstEvent(
         data.start,
@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     addZeros: (n) => n > 0 && n < 10 && `0${n}`,
-    getRandomColor: function() {
+    getRandomColor: function () {
       let colors = ["#A4F3B1", "#B9A4F3", "A4EAF3", "F29090"];
       return colors[Math.floor(Math.random() * (colors.length - 1))];
     },
@@ -88,7 +88,7 @@ export default {
 
     //   return infosWithFormatedDate;
     // },
-    placeFirstEvent: function(start, duration, description) {
+    placeFirstEvent: function (start, duration, description) {
       let end = new Date(start);
 
       // calculate end based on event duration
