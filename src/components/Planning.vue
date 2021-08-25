@@ -52,7 +52,7 @@ export default {
   async mounted() {
     try {
       let response = await axios.get(
-        `${process.env.VUE_APP_URL}/users/${this.$route.params.id}/activities`
+        `${process.env.VUE_APP_URL}/${this.$route.params.id}/activities`
       );
       let data = response.data.data[0];
       let firstEvent = data.description[0];
