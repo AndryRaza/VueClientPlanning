@@ -51,14 +51,19 @@ export default {
   },
   async mounted() {
     try {
-      let response = await axios.get(
+      let activites = await axios.get(
         `${process.env.VUE_APP_URL}/${this.$route.params.id}/activities`
       );
-      let data = response.data.data;
+      let examen = await axios.get(
+        `${process.env.VUE_APP_URL}/${this.$route.params.id}/examens`
+      );
+      let data = activites.data.data;
       let firstEvent = data[0];
 
+      let dataExam = examen.data.data[0];
+
       this.placeFirstEvent(
-        data.start,
+        dataExam.start,
         firstEvent.duree,
         firstEvent.description
       );
@@ -137,6 +142,8 @@ h1 {
 }
 
 .description {
+  font-weight: bold;
+  font-size: 1rem;
   margin-top: 5px;
   height: 30px;
   overflow: hidden;
