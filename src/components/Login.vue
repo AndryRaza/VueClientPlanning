@@ -1,30 +1,31 @@
 <template>
 
+    <div class="wrapper">
+        <div class="card">
+            <div class="error" v-if="error">
+                Mot de passe ou Login incorrect
+            </div> 
 
-    <div class="card">
-        <div class="error" v-if="error">
-            Mot de passe ou Login incorrect
-        </div> 
+            <h1 class="title">Se connecter</h1>
+            <form>
+                <input 
+                    type="text" 
+                    name="login" 
+                    v-model="login" 
+                    placeholder="Login"
+                />
 
-        <h1 class="title">Se connecter</h1>
-        <form>
-            <input 
-                type="text" 
-                name="login" 
-                v-model="login" 
-                placeholder="Login"
-            />
+                <input 
+                    type="password"     
+                    name="password" 
+                    v-model="password" 
+                    placeholder="Mot de passe"
+                />
 
-            <input 
-                type="password"     
-                name="password" 
-                v-model="password" 
-                placeholder="Mot de passe"
-            />
+                <button type="submit" class="submit-btn" @click="tryToLogin">Se connecter</button>
+            </form>
 
-            <button type="submit" class="submit-btn" @click="tryToLogin">Se connecter</button>
-        </form>
-
+        </div>
     </div>
 </template>
 
@@ -58,13 +59,14 @@ export default {
 }
 </script>
 
-<style>
-body {
+<style >
+
+.wrapper {
+    height: 100vh;
+    widows: 100vw;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 .card {
     padding: 40px;
