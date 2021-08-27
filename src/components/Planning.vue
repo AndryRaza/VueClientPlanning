@@ -51,16 +51,19 @@ export default {
   },
   async mounted() {
     try {
+        
       let activites = await axios.get(
-        `${process.env.VUE_APP_URL}/${this.$route.params.id}/activities`
+        `${process.env.VUE_APP_URL}/users/${this.$route.params.id}/activities`
       );
       let examen = await axios.get(
-        `${process.env.VUE_APP_URL}/${this.$route.params.id}/examens`
+        `${process.env.VUE_APP_URL}/users/${this.$route.params.id}/examens`
       );
       let data = activites.data.data;
       let firstEvent = data[0];
 
       let dataExam = examen.data.data[0];
+
+      console.log("activities data", data, "examen data", dataExam);
 
       this.placeFirstEvent(
         dataExam.start,
@@ -100,10 +103,7 @@ export default {
       end.setMinutes(end.getMinutes() + parseInt(duration));
 
       //get Date Time string
-      end = `${end.getFullYear()}-${this.addZeros(
-        end.getMonth() + 1
-      )}-${end.getDate()}T${end.toTimeString().split(" ")[0]}`;
-      console.log(start, end);
+      end = end.toISOString();
 
       this.calendarOptions.events.push({
         start,
