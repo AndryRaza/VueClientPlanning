@@ -3,7 +3,7 @@
     <div class="wrapper">
         <div class="card">
             <div class="error" v-if="error">
-                Mot de passe ou Login incorrect
+              Mot de passe ou login incorrect
             </div> 
 
             <h1 class="title">Se connecter</h1>
@@ -31,6 +31,7 @@
 
 <script>
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
     data : function () {
@@ -56,14 +57,21 @@ export default {
                 } 
                 
                 let data = res.data;
-                let token = `Bearer ${data['access_token']}`
+                let token = `Bearer ${data['access_token']}`;
+                let payload = {
+                    token,
+                    userId: jwt_decode(data['access_token']).userId,
+                    roleId: jwt_decode(data['access_token']).role
+                }
+
                 this.error = false;
-                
-                this.$store.commit('setToken', token);
+                this.$store.commit('setInfos', payload);
+
+                console.log(this.$store.state)
 
             } catch (e) {
                 console.error("Error", e);
-                this.error = "An error occured";
+                this.error = false;
             }
         
         },

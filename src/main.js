@@ -26,7 +26,13 @@ const store = new Vuex.Store({
       state.userId = userId
     },
     setRoleId (state, roleId) {
-      state.roelId = roleId
+      state.roleId = roleId
+    },
+    setInfos (state, payload) {
+      state.token = payload.token;
+      state.userId = payload.userId;
+      state.roleId = payload.roleId;
+
     }
   }
 });
