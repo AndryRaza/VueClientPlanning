@@ -41,19 +41,31 @@ export default {
         }
     },
     methods: {
-        // A COMPLETER QUAND PARTIE API INTEGRE
         tryToLogin: async function (e) {
             e.preventDefault();
 
-            let res = await axios.post(
-            // `${process.env.VUE_APP_URL}/${}/`
-            )
+            try  {
+                let res = await axios.post(`${process.env.VUE_APP_URL}/auth/login/`, {
+                    email: this.login,
+                    password: this.password
+                });
 
-            if (res.status != 200) {
-                this.error = true;
-            } else {
+                if (res.status != 200) {
+                    this.error = true;
+                    return;
+                } 
+                
+                let data = res.data;
+                let token = `Bearer ${data['access_token']}`
                 this.error = false;
+                
+                this.$store.commit('setToken', token);
+
+            } catch (e) {
+                console.error("Error", e);
+                this.error = "An error occured";
             }
+        
         },
     }
 }
@@ -109,6 +121,9 @@ form input {
     cursor:pointer
 }
 
+.error {
+    color:red;
+}
 
 @media screen and (max-width: 720px) {
     .card  {
