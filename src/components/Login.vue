@@ -66,9 +66,13 @@ export default {
 
                 this.error = false;
                 this.$store.commit('setInfos', payload);
-
-                console.log(this.$store.state)
-
+                this.$store.commit('setIsLogged', true);
+                this.$store.dispatch('checkTokenExpirationDate');
+                
+                this.$router.push({
+                    name:'Planning',
+                    params: {id: payload.userId}
+                });
             } catch (e) {
                 console.error("Error", e);
                 this.error = false;

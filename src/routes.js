@@ -5,8 +5,8 @@ import Examiner from './components/Examiner.vue'
 
 const routes = [
     {path : '*',component: Home},
-    {path : '/planning/:id', component : Planning},
-    {path: '/', component: Login},
+    {path : '/planning/:id', component : Planning, name:'Planning'},
+    {path: '/login', component: Login, name:'Login'},
     {path: '/examiner', component: Examiner}
 ];
 
