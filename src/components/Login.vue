@@ -26,6 +26,7 @@
 
 <script>
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   data: function() {
@@ -40,14 +41,36 @@ export default {
     tryToLogin: async function(e) {
       e.preventDefault();
 
-      let res = await axios
-        .post
-        // `${process.env.VUE_APP_URL}/${}/`
-        ();
+      try {
+        let res = await axios.post(`${process.env.VUE_APP_URL}/auth/login/`, {
+          email: this.login,
+          password: this.password,
+        });
 
-      if (res.status != 200) {
-        this.error = true;
-      } else {
+        if (res.status != 200) {
+          this.error = true;
+          return;
+        }
+
+        let data = res.data;
+        let token = `Bearer ${data["access_token"]}`;
+        let payload = {
+          token,
+          userId: jwt_decode(data["access_token"]).userId,
+          roleId: jwt_decode(data["access_token"]).role,
+        };
+
+        this.error = false;
+        this.$store.commit("setInfos", payload);
+        this.$store.commit("setIsLogged", true);
+        this.$store.dispatch("checkTokenExpirationDate");
+
+        this.$router.push({
+          name: "Planning",
+          params: { id: payload.userId },
+        });
+      } catch (e) {
+        console.error("Error", e);
         this.error = false;
       }
     },
@@ -129,7 +152,15 @@ form input {
   border-radius: 10px;
 }
 
-@media screen and (max-width: 720px) {
+<<<<<<< head ======= .error {
+  color: red;
+}
+
+>>>>>>>72441500adccf019b656e5894d826df03e65bbd5
+  @media
+  screen
+  and
+  (max-width: 720px) {
   .card {
     width: 100%;
     height: 100%;
